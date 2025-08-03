@@ -30,9 +30,6 @@ body{
     background-color: rgb(255, 255, 158);
 }
 
-.food{
-    background-color: red;
-}
 
 .score{
     background-color: white;
@@ -55,4 +52,24 @@ button:hover{
 .buttons{
     display: flex;
     gap: 1rem;
+}
+
+.game-over{
+    background-color: white;
+    padding: 3rem 6rem;
+    text-align: center;
+    border-radius: 1rem;
+    position: absolute;
+    transition: 0.1s;
+    display: none;
+}
+
+.game-over h2{
+    color: red;
+    margin-bottom: 0.5rem;
+}
+
+.game-over p{
+    color: grey;
+    margin-top: 0.5rem;
 }
