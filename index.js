@@ -5,15 +5,19 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const gameOver=document.querySelector('.game-over');
     const score=document.getElementById('score');
 
-    let snakeMouth;
+    let snakeBody=[];
     let snakeMouthIndex;
     let intervalId;
-    let snakeLength=1;
     let foodIndex;
+    let t=1000;
     function generateFood() {
         //196
         foodIndex=Math.floor(Math.random()*196);
         let foodCell=tile[foodIndex];
+        while(snakeBody.includes(foodIndex)){
+            score.textContent=parseInt(score.textContent)+1;
+            generateFood();
+        }
         foodCell.style.backgroundColor='red';
     }
 
@@ -22,41 +26,67 @@ document.addEventListener('DOMContentLoaded', ()=>{
         document.addEventListener('keydown', (e)=>{
             currentDirection=e.key;
         });
-        snakeMouth.style.backgroundColor='rgb(255,255,158)';
+        for(let i=1;i<snakeBody.length;i++){
+            if(snakeBody[i]===snakeMouthIndex){
+                gameOver.style.display="block";
+                clearInterval(intervalId);
+            }
+        }
+        if(snakeMouthIndex%14===0 && currentDirection==="ArrowLeft"){
+            gameOver.style.display="block";
+            clearInterval(intervalId);
+        }
+        if(snakeMouthIndex%14===13 && currentDirection==="ArrowRight"){
+            gameOver.style.display="block";
+            clearInterval(intervalId);
+        }
+        if(snakeMouthIndex<=13 && currentDirection==="ArrowUp"){
+            gameOver.style.display="block";
+            clearInterval(intervalId);
+        }
+        if(snakeMouthIndex<=195 && snakeMouthIndex>=182 && currentDirection==="ArrowDown"){
+            gameOver.style.display="block";
+            clearInterval(intervalId);
+        }
         if(currentDirection==="ArrowUp")
-        {
-            snakeMouth=tile[snakeMouthIndex-14];
             snakeMouthIndex-=14;
-        }
         else if(currentDirection==="ArrowDown")
-        {
-            snakeMouth=tile[snakeMouthIndex+14];
             snakeMouthIndex+=14;
-        }
         else if(currentDirection==="ArrowLeft")
-        {
-            snakeMouth=tile[snakeMouthIndex-1];
             snakeMouthIndex-=1;
-        }
         else if(currentDirection==="ArrowRight")
-        {
-            snakeMouth=tile[snakeMouthIndex+1];
             snakeMouthIndex+=1;
-        }
+        // add new head
+        snakeBody.unshift(snakeMouthIndex);
         //updating score
-        if(snakeMouthIndex===foodIndex)
-        {
-            snakeLength+=1;
+        if(snakeMouthIndex===foodIndex){
             score.textContent=parseInt(score.textContent)+1;
             generateFood();
+            if(parseInt(score.textContent)%10===0){
+                clearInterval(intervalId);
+                if(t===100)
+                    t=200;
+                intervalId=setInterval(snake, t-100);
+                t=t-100;
+            }
         }
-        snakeMouth.style.backgroundColor='green';
+        else {
+            // remove tail if not eating
+            let tail = snakeBody.pop();
+            tile[tail].style.backgroundColor = "rgba(255, 255, 0, 1)";
+            tile[tail].style.border="none";
+        }
+        snakeBody.forEach(i => {
+            tile[i].style.backgroundColor = 'white';
+            tile[i].style.border="4px solid blue";
+        });
     }
     start.addEventListener('click', ()=>{
         start.disabled=true;
-        snakeMouth=tile[104];
+        snakeBody=[104];
         snakeMouthIndex=104;
-        snakeMouth.style.backgroundColor='green';
+        tile[104].style.backgroundColor="white";
+        tile[104].style.border="4px solid blue";
         //generating food
         generateFood();
         //snake(moving, length increment, collision)
@@ -65,6 +95,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
 
     reset.addEventListener('click', ()=>{
-
+        snakeBody.forEach(i => {
+            tile[i].style.backgroundColor = 'rgba(255, 255, 0, 1)';
+        });
+        gameOver.style.display="none";
+        score.textContent="0";
+        start.disabled=false;
+        currentDirection="none";
     });
 });
